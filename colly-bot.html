@@ -5,154 +5,197 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title># Cruffx - DevPage / Personal portfolio</title>
- <script>
-  $(function() {
-  var Accordion = function(el, multiple) {
-    this.el = el || {};
-    this.multiple = multiple || false;
-
-    // Variables privadas
-    var links = this.el.find('.link');
-    // Evento
-    links.on('click', {el: this.el, multiple: this.multiple}, this.dropdown)
-  }
-
-  Accordion.prototype.dropdown = function(e) {
-    var $el = e.data.el;
-      $this = $(this),
-      $next = $this.next();
-
-    $next.slideToggle();
-    $this.parent().toggleClass('open');
-
-    if (!e.data.multiple) {
-      $el.find('.submenu').not($next).slideUp().parent().removeClass('open');
-    };
-  } 
-
-  var accordion = new Accordion($('#accordion'), false);
-});
- </script>
 <style>
-  * {
-  margin: 0;
-  padding: 0;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
+  @import "compass/css3";
+
+@import url("https://fonts.googleapis.com/css?family=Lato:300,400,700,900");
+@import url(https://fonts.googleapis.com/css?family=Pacifico);
 
 body {
-  background: #2d2c41;
-  font-family: 'Open Sans', Arial, Helvetica, Sans-serif, Verdana, Tahoma;
+  font-family: "Lato", Helvetica, Arial;
+  font-size: 16px;
 }
 
-ul { list-style-type: none; }
-
-a {
-  color: #b63b4d;
-  text-decoration: none;
+*, *:before, *:after {
+  -webkit-border-sizing: border-box;
+  -moz-border-sizing: border-box;
+  border-sizing: border-box;
 }
 
-/** =======================
- * Contenedor Principal
- ===========================*/
+.container {
+  width: 350px;
+  margin: 50px auto;
+  
+  & > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+  }
+}
 
+// =============================================================================
+//  Mixins and Variables
+// =============================================================================
 
-h1 {
-  color: #FFF;
-  font-size: 24px;
-  font-weight: 400;
+$orange: #C0392B;
+$blue: #2980B9;
+$gray: #EEE;
+
+@mixin ul-nostyle {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@mixin double-shadow($color) {
+  @include box-shadow(0 1px 0 lighten($color, 10%) inset, 0 -1px 0 darken($color, 10%) inset);
+}
+
+@mixin hover-style($color) {
+  &:hover {
+    background: lighten($color, 3%);
+  }
+}
+
+@mixin animation($content) {
+  animation: $content;
+  -moz-animation: $content;
+  -webkit-animation: $content;
+}
+
+@mixin keyframes($name) {
+  @keyframes #{$name} { @content; }
+  @-moz-keyframes #{$name} { @content; }
+  @-webkit-keyframes #{$name} { @content; }
+}
+
+// =============================================================================
+//  Classes
+// =============================================================================
+
+.title {
+  font-family: 'Pacifico';
+  font-weight: norma;
+  font-size: 40px;
   text-align: center;
-  margin-top: 80px;
+  line-height: 1.4;
+  color: $orange;
 }
 
-h1 a {
-  color: #c12c42;
-  font-size: 16px;
-}
-
-.accordion {
-  width: 100%;
-  max-width: 360px;
-  margin: 30px auto 20px;
-  background: #FFF;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-
-.accordion .link {
-  cursor: pointer;
-  display: block;
-  padding: 15px 15px 15px 42px;
-  color: #4D4D4D;
-  font-size: 14px;
-  font-weight: 700;
-  border-bottom: 1px solid #CCC;
+.dropdown {
   position: relative;
-  -webkit-transition: all 0.4s ease;
-  -o-transition: all 0.4s ease;
-  transition: all 0.4s ease;
+  
+  a { text-decoration: none; }
+
+  [data-toggle="dropdown"] {
+    display: block;
+    color: white;
+    background: $orange;
+    @include double-shadow($orange);
+    @include hover-style($orange);
+    @include text-shadow(0 -1px 0 rgba(0,0,0,0.3));
+    padding: 10px;
+    
+    &:before {
+      position: absolute;
+      display: block;
+      content: '\25BC';
+      font-size: 0.7em;
+      color: #fff;
+      top: 13px;
+      right: 10px;
+      @include transform(rotate(0deg));
+      @include transition(transform .6s);
+    }
+  }
+
+  & > .dropdown-menu {
+    max-height: 0;
+    overflow: hidden;
+    @include ul-nostyle;
+    @include transform(scaleY(0));
+    @include transform-origin(50%, 0%);
+    @include transition(max-height .6s ease-out);
+    @include animation(hideAnimation .4s ease-out);
+
+    li {
+      padding: 0;
+
+      a {
+        display: block;
+        color: darken($gray, 50%);
+        background: $gray;
+        @include double-shadow($gray);
+        @include hover-style($gray);
+        @include text-shadow(0 -1px 0 rgba(255,255,255,0.3));
+        padding: 10px 10px;
+      }
+    }
+  }
+  
+  & > input[type="checkbox"] {
+    opacity: 0;
+    display: block;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    
+    &:checked ~ .dropdown-menu {
+      max-height: 9999px;
+      display: block;
+      @include transform(scaleY(1));
+      @include animation(showAnimation .5s ease-in-out);
+      @include transition(max-height 2s ease-in-out);
+    }
+    
+    &:checked + a[data-toggle="dropdown"] {
+      &:before {
+        @include transform(rotate(-180deg));
+        @include transition(transform .6s);
+      }
+    }
+  }
 }
 
-.accordion li:last-child .link { border-bottom: 0; }
-
-.accordion li i {
-  position: absolute;
-  top: 16px;
-  left: 12px;
-  font-size: 18px;
-  color: #595959;
-  -webkit-transition: all 0.4s ease;
-  -o-transition: all 0.4s ease;
-  transition: all 0.4s ease;
+@include keyframes(showAnimation) {
+  0% {
+    @include transform(scaleY(0.1));
+  }
+  40% {
+    @include transform(scaleY(1.04));
+  }
+  60% {
+    @include transform(scaleY(0.98));
+  }
+  80% {
+    @include transform(scaleY(1.04));
+  }
+  100% {
+    @include transform(scaleY(0.98));
+  }       
+  80% {
+    @include transform(scaleY(1.02));
+  }
+  100% {
+    @include transform(scaleY(1));
+  }
 }
 
-.accordion li i.fa-chevron-down {
-  right: 12px;
-  left: auto;
-  font-size: 16px;
-}
-
-.accordion li.open .link { color: #b63b4d; }
-
-.accordion li.open i { color: #b63b4d; }
-
-.accordion li.open i.fa-chevron-down {
-  -webkit-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
-  -o-transform: rotate(180deg);
-  transform: rotate(180deg);
-}
-
-/**
- * Submenu
- -----------------------------*/
-
-
-.submenu {
-  display: none;
-  background: #444359;
-  font-size: 14px;
-}
-
-.submenu li { border-bottom: 1px solid #4b4a5e; }
-
-.submenu a {
-  display: block;
-  text-decoration: none;
-  color: #d9d9d9;
-  padding: 12px;
-  padding-left: 42px;
-  -webkit-transition: all 0.25s ease;
-  -o-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-}
-
-.submenu a:hover {
-  background: #b63b4d;
-  color: #FFF;
+@include keyframes(hideAnimation) {
+  0% {
+    @include transform(scaleY(1));
+  }
+  60% {
+    @include transform(scaleY(0.98));
+  }
+  80% {
+    @include transform(scaleY(1.02));
+  }
+  100% {
+    @include transform(scaleY(0));
+  }
 }
   </style>
 <!-- CSS files begin-->
@@ -178,41 +221,41 @@ h1 a {
   <br>
   <br>
   <br>
-   <!-- Contenedor -->
-<ul id="accordion" class="accordion">
-  <li>
-    <div class="link"><i class="fa fa-database"></i>Web Design<i class="fa fa-chevron-down"></i></div>
-    <ul class="submenu">
-      <li><a href="#">Photoshop</a></li>
-      <li><a href="#">HTML</a></li>
-      <li><a href="#">CSS</a></li>
-    </ul>
-  </li>
-  <li>
-    <div class="link"><i class="fa fa-code"></i>Coding<i class="fa fa-chevron-down"></i></div>
-    <ul class="submenu">
-      <li><a href="#">Javascript</a></li>
-      <li><a href="#">jQuery</a></li>
-      <li><a href="#">Ruby</a></li>
-    </ul>
-  </li>
-  <li>
-    <div class="link"><i class="fa fa-mobile"></i>Devices<i class="fa fa-chevron-down"></i></div>
-    <ul class="submenu">
-      <li><a href="#">Tablet</a></li>
-      <li><a href="#">Mobile</a></li>
-      <li><a href="#">Desktop</a></li>
-    </ul>
-  </li>
-  <li>
-    <div class="link"><i class="fa fa-globe"></i>Global<i class="fa fa-chevron-down"></i></div>
-    <ul class="submenu">
-      <li><a href="#">Google</a></li>
-      <li><a href="#">Bing</a></li>
-      <li><a href="#">Yahoo</a></li>
-    </ul>
-  </li>
-</ul>
+<div class="container">
+  <h1 class="title">Dropdown Menu</h1>
+  <ul>
+    <li class="dropdown">
+      <input type="checkbox" />
+      <a href="#" data-toggle="dropdown">First Menu</a>
+      <ul class="dropdown-menu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <input type="checkbox" />
+      <a href="#" data-toggle="dropdown">Second Menu</a>
+      <ul class="dropdown-menu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <input type="checkbox" />
+      <a href="#" data-toggle="dropdown">Third Menu</a>
+      <ul class="dropdown-menu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
     
 <!--                       <h5 class="right">
                         Copyright 2023, All Rights Reserved by Cruffx and zxcoderr
